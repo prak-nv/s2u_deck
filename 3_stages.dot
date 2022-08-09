@@ -1,0 +1,50 @@
+digraph batch {
+  bgcolor="lightblue"
+  node [shape=doublecircle style=filled color=white]
+  label="single batch";
+  subgraph cluster_cpu_stage {
+    style=filled;
+    color="#0071c5";
+    node [style=filled,color=white];
+    c0 -> c1 -> c2 -> c3;
+    label = "CPU";
+  }
+
+  subgraph cluster_mixed_stage {
+    style=filled;
+    label = "Mixed (h2d)";
+    //color = "#3b9563";
+    fillcolor=lightgrey;
+    color=lightgrey;
+    node [style=filled,color=white];
+    m0 [label="m0"];
+    m1 [label="m1"];
+  }
+
+  subgraph cluster_gpu_stage {
+    style=filled;
+    color="#76b900";
+    label = "GPU";
+    node [style=filled,color=white];
+    g0;
+    g1;
+    g0 -> g1;
+  }
+
+  c2 -> m0;
+  c3 -> m1;
+
+  m0 -> g0;
+  m0 -> g1;
+  m1 -> g1;
+}
+
+/*
+digraph cluster_exe {
+  label = "execution";
+  cluster_cpu_stage [label="CPU" color="#0071c5" style=filled shape=square];
+  cluster_mixed_stage [label="H2D" color=black fillcolor=lightgrey style=filled shape=Mcircle];
+  cluster_gpu_stage [label="GPU", color="#76b900", style=filled shape=circle];
+  cluster_cpu_stage -> cluster_mixed_stage -> cluster_gpu_stage;
+}
+*/

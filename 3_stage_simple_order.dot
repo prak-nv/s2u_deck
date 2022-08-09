@@ -1,0 +1,53 @@
+digraph batch_deps {
+  label = "Simple executor";
+
+  subgraph cluster_exe0 {
+    label = "Batch #0";
+    cluster_cpu_stage0 [label="CPU #0" color="#0071c5" style=filled shape=square];
+    cluster_mixed_stage0 [label="H2D #0" color=black fillcolor=lightgrey style=filled shape=Mcircle];
+    cluster_gpu_stage0 [label="GPU #0", color="#76b900", style=filled shape=circle];
+    edge [arrowhead=empty color=red]
+    cluster_cpu_stage0 -> cluster_mixed_stage0 -> cluster_gpu_stage0;
+  }
+
+  subgraph cluster_exe1 {
+    label = "Batch #1";
+    cluster_cpu_stage1 [label="CPU #1" color="#0071c5" style=filled shape=square];
+    cluster_mixed_stage1 [label="H2D #1" color=black fillcolor=lightgrey style=filled shape=Mcircle];
+    cluster_gpu_stage1 [label="GPU #1", color="#76b900", style=filled shape=circle];
+    edge [arrowhead=empty color=red]
+    cluster_cpu_stage1 -> cluster_mixed_stage1 -> cluster_gpu_stage1;
+  }
+
+  subgraph cluster_exedotdot {
+    label = "Batch #...";
+    cluster_cpu_stage_dotdot [label="CPU #..." color="#0071c5" style=filled shape=square];
+    cluster_mixed_stage_dotdot [label="H2D #..." color=black fillcolor=lightgrey style=filled shape=Mcircle];
+    cluster_gpu_stage_dotdot [label="GPU #...", color="#76b900", style=filled shape=circle];
+    edge [arrowhead=empty color=red]
+    cluster_cpu_stage_dotdot -> cluster_mixed_stage_dotdot -> cluster_gpu_stage_dotdot;
+  }
+
+  subgraph cluster_exeN {
+    label = "Batch #N";
+    cluster_cpu_stage_N [label="CPU #N" color="#0071c5" style=filled shape=square];
+    cluster_mixed_stage_N [label="H2D #N" color=black fillcolor=lightgrey style=filled shape=Mcircle];
+    cluster_gpu_stage_N [label="GPU #N", color="#76b900", style=filled shape=circle];
+    edge [arrowhead=empty color=red]
+    cluster_cpu_stage_N -> cluster_mixed_stage_N -> cluster_gpu_stage_N;
+  }
+
+  edge [arrowhead=empty color=darkgrey]
+
+  cluster_cpu_stage0 -> cluster_cpu_stage1 -> cluster_cpu_stage_dotdot -> cluster_cpu_stage_N;
+  cluster_mixed_stage0 -> cluster_mixed_stage1 -> cluster_mixed_stage_dotdot -> cluster_mixed_stage_N;
+  cluster_gpu_stage0 -> cluster_gpu_stage1 -> cluster_gpu_stage_dotdot -> cluster_gpu_stage_N;
+
+
+  edge [arrowhead=empty color=red]
+
+  cluster_gpu_stage0 -> cluster_cpu_stage1;
+  cluster_gpu_stage1 -> cluster_cpu_stage_dotdot;
+  cluster_gpu_stage_dotdot -> cluster_cpu_stage_N;
+
+}

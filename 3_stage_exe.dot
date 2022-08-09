@@ -1,0 +1,8 @@
+
+digraph cluster_exe {
+  label = "Execution in stages";
+  cluster_cpu_stage [label="CPU" color="#0071c5" style=filled shape=square];
+  cluster_mixed_stage [label="H2D" color=black fillcolor=lightgrey style=filled shape=Mcircle];
+  cluster_gpu_stage [label="GPU", color="#76b900", style=filled shape=circle];
+  cluster_cpu_stage -> cluster_mixed_stage -> cluster_gpu_stage;
+}

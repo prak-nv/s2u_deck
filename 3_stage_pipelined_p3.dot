@@ -1,0 +1,127 @@
+digraph pipelined_exe {
+  label = "[Part3] Pipelined executors (async) = N-Buffering";
+
+  subgraph cluster_exe0 {
+    label = "Batch #0";
+    cluster_cpu_stage0 [label="CPU #0" color="#0071c5" style=filled shape=square];
+    cluster_mixed_stage0 [label="H2D #0" color=black fillcolor=lightgrey style=filled shape=Mcircle];
+    cluster_gpu_stage0 [label="GPU #0", color="#76b900", style=filled shape=circle];
+    cluster_cpu_stage0 -> cluster_mixed_stage0 -> cluster_gpu_stage0;
+  }
+
+  subgraph cluster_exe1 {
+    label = "Batch #1";
+    cluster_cpu_stage1 [label="CPU #1" color="#0071c5" style=filled shape=square];
+    cluster_mixed_stage1 [label="H2D #1" color=black fillcolor=lightgrey style=filled shape=Mcircle];
+    cluster_gpu_stage1 [label="GPU #1", color="#76b900", style=filled shape=circle];
+    cluster_cpu_stage1 -> cluster_mixed_stage1 -> cluster_gpu_stage1;
+  }
+
+  subgraph cluster_exedotdot {
+    label = "Batch #...";
+    cluster_cpu_stage_dotdot [label="CPU #..." color="#0071c5" style=filled shape=square];
+    cluster_mixed_stage_dotdot [label="H2D #..." color=black fillcolor=lightgrey style=filled shape=Mcircle];
+    cluster_gpu_stage_dotdot [label="GPU #...", color="#76b900", style=filled shape=circle];
+    cluster_cpu_stage_dotdot -> cluster_mixed_stage_dotdot -> cluster_gpu_stage_dotdot;
+  }
+
+  subgraph cluster_exeN {
+    label = "Batch #N";
+    cluster_cpu_stage_N [label="CPU #N" color="#0071c5" style=filled shape=square];
+    cluster_mixed_stage_N [label="H2D #N" color=black fillcolor=lightgrey style=filled shape=Mcircle];
+    cluster_gpu_stage_N [label="GPU #N", color="#76b900", style=filled shape=circle];
+    cluster_cpu_stage_N -> cluster_mixed_stage_N -> cluster_gpu_stage_N;
+  }
+  edge [arrowhead=empty color=darkgrey]
+
+  cluster_cpu_stage0 -> cluster_cpu_stage1 -> cluster_cpu_stage_dotdot -> cluster_cpu_stage_N;
+  cluster_mixed_stage0 -> cluster_mixed_stage1  -> cluster_mixed_stage_dotdot -> cluster_mixed_stage_N;
+  cluster_gpu_stage0 -> cluster_gpu_stage1 ->  cluster_gpu_stage_dotdot -> cluster_gpu_stage_N;
+
+  graph [
+    rankdir = "LR";
+  ];
+  subgraph cluster_N_buffering {
+     node [shape = record]     
+     label = "Qs"
+     labeljust=l;
+
+     "buffer indices" [
+        label = "buffer indices|<i0> idx 0 | <i1> idx 1 | <i_dot>  idx ...| <i_N_1> idx N - 1| <i_N> idx N"
+        shape = record;
+        style = filled;
+     ]
+
+     "free queue" [
+        label = "free queue | <fq0>  | <fq1>  | <fq_dot>  ...| <fq_N>  N"
+        shape = record;
+        style = filled;
+     ]
+
+     "ready queue" [
+        label = "ready queue | <rq0>  | <rq1>  | <rq_dot>  ...| <rq_N>  N"
+        shape = record;
+        style = filled;
+     ]
+
+
+     edge [color=red label="uses" labelcolor="red"]
+     "buffer indices":i0 -> cluster_gpu_stage0 [id = 0];
+     "buffer indices":i1 -> cluster_cpu_stage1 [id = 1];
+     edge [color=black label=""];
+     "buffer indices":i_N_1 -> "ready queue":rq0 [id = 2];
+     "buffer indices":i_N -> "free queue":fq0 [id = 3];
+
+     edge [color=darkblue label="produced" labelcolor=blue]
+     cluster_mixed_stage0 -> "ready queue":rq0 [id = 4];
+  }
+
+  subgraph cluster_threads {
+     label = "Async threads"
+
+     "CPU wq" [
+        label = "CPU thread wq (concept only)|<c0> idx 0 | <c1> idx 1 | <c_dot>  idx ...| <c_N> idx N"
+        shape = record;
+        style = filled;
+        fillcolor="#0071c5";
+     ]
+
+     "Mixed wq" [
+        label = "Mixed thread wq (concept only)|<m0> idx 0 | <m1> idx 1 | <m_dot>  idx ...| <m_N> idx N"
+        shape = record;
+        style = filled;
+        fillcolor=lightgrey;
+     ]
+     
+     "GPU wq" [
+        label = "GPU thread wq (concept only)|<g0> idx 0 | <g1> idx 1 | <g_dot>  idx ...| <g_N> idx N"
+        shape = record;
+        style = filled;
+        fillcolor="#76b900";
+     ]
+
+     cpu_thread [label="CPU thread" shape=circle style=filled color="#0071c5"];
+     mixed_thread [label="Mixed thread" shape=circle style=filled color=lightgrey]
+     gpu_thread [label="GPU thread" shape=circle style=filled color="#76b900"];
+
+     cpu_thread -> "CPU wq";
+     mixed_thread -> "Mixed wq";
+     gpu_thread -> "GPU wq";
+
+     edge [color=darkgrey]
+     "CPU wq":c0 -> cluster_cpu_stage0
+     "CPU wq":c1 -> cluster_cpu_stage1
+     "CPU wq":c_dot -> cluster_cpu_stage_dotdot
+     "CPU wq":c_N -> cluster_cpu_stage_N
+
+     "Mixed wq":m0 -> cluster_mixed_stage0
+     "Mixed wq":m1 -> cluster_mixed_stage1
+     "Mixed wq":m_dot -> cluster_mixed_stage_dotdot
+     "Mixed wq":m_N -> cluster_cpu_stage_N
+
+     "GPU wq":g0 -> cluster_gpu_stage0
+     "GPU wq":g1 -> cluster_gpu_stage1
+     "GPU wq":g_dot -> cluster_gpu_stage_dotdot
+     "GPU wq":g_N -> cluster_gpu_stage_N
+  }
+}
