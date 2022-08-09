@@ -73,7 +73,7 @@ digraph pipelined_exe {
      "buffer indices":i_N -> "free queue":fq0 [id = 3];
 
      edge [color=darkblue label="produced" labelcolor=blue]
-     cluster_mixed_stage0 -> "ready queue":rq0 [id = 4];
+     //cluster_mixed_stage0 -> "ready queue":rq0 [id = 4];
   }
 
   subgraph cluster_threads {

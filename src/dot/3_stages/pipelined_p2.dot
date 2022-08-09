@@ -99,8 +99,8 @@ digraph pipelined_exe {
 
 
      edge [color=darkblue label="produced"]
-     cluster_mixed_stage0 -> "ready queue D":rqd0 [id = 4];
-     cluster_cpu_stage0 -> "ready queue H":rqh0 [id = 5];
+     //cluster_mixed_stage0 -> "ready queue D":rqd0 [id = 4];
+     //cluster_cpu_stage0 -> "ready queue H":rqh0 [id = 5];
 
   }
 }
