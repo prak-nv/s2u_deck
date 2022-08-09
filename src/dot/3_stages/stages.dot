@@ -1,4 +1,3 @@
-
 digraph cluster_exe {
   label = "Execution in stages";
   cluster_cpu_stage [label="CPU" color="#0071c5" style=filled shape=square];
